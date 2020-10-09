@@ -1,14 +1,38 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useState} from "react";
 import {useDropzone} from "react-dropzone";
-import axios from "axios";
+import Loader from 'react-loader-spinner'
 
 const Main = (props) => {
-    const onDrop = useCallback(acceptedFiles => {
-        console.log(acceptedFiles);
+    const [file, setFile] = useState([]);
+    const [showUpload, setShowUpload] = useState(true);
+    const [uploadPercentages, setUploadPercentages] = useState(0);
 
+    const onDrop = useCallback(acceptedFiles => {
+        setShowUpload(false);
+        const uploading = acceptedFiles.map(file => {
+            const formData = new FormData();
+            formData.append("cloudesk_upload[]", file);
+            const xhr = new XMLHttpRequest();
+            xhr.upload.onprogress = event => {
+                const percentage = parseInt((event.loaded / event.total) * 100);
+                console.log(event);
+                setUploadPercentages(percentage);
+            };
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status !== 200) {
+                    console.log('error'); // Handle error here
+                }
+                console.log('success'); // Handle success here
+            };
+
+            setTimeout(() => {
+                xhr.open('POST', `${window.API_URL}/upload`, true);
+                xhr.send(formData);
+            }, 3000)
+        });
     }, [])
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
-    axios.post(window.API_URL + 'upload').then((res) => console.log(res)).catch(err => console.log(err));
 
     return (
         <div>
@@ -18,18 +42,21 @@ const Main = (props) => {
                     <div className="px-8 py-2">
                         <div className="font-semibold mb-2">ClouDesk.space</div>
                         <div className="font-bold text-xl mb-2">Upload your files (translate)</div>
-                        <div
-                            className="border-dashed border-2  w-64 h-32 rounded flex justify-center px-2 mt-12 mb-12 cursor-pointer items-center">
-                            <input {...getInputProps()}
-                                   required/>
+                        {showUpload ?
+                            <div
+                                className="border-dashed border-2  w-64 h-32 rounded flex justify-center px-2 mt-12 mb-12 cursor-pointer items-center">
 
-                            {isDragActive ?
-                                <p>Drop it now and leave it to us to make everything work ok!</p> :
-                                <>
-                                    <svg version="1.1" className="h-8 text-grey mr-2" xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 60 60">
-                                        <g>
-                                            <path d="M50.975,20.694c-0.527-9-7.946-16.194-16.891-16.194c-5.43,0-10.688,2.663-13.946,7.008
+                                <input {...getInputProps()}
+                                       required/>
+
+                                {isDragActive ?
+                                    <p>Drop it now and leave it to us to make everything work ok!</p> :
+                                    <>
+                                        <svg version="1.1" className="h-8 text-grey mr-2"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 60 60">
+                                            <g>
+                                                <path d="M50.975,20.694c-0.527-9-7.946-16.194-16.891-16.194c-5.43,0-10.688,2.663-13.946,7.008
 		c-0.074-0.039-0.153-0.065-0.228-0.102c-0.198-0.096-0.399-0.188-0.605-0.269c-0.115-0.045-0.23-0.086-0.346-0.127
 		c-0.202-0.071-0.406-0.133-0.615-0.19c-0.116-0.031-0.231-0.063-0.349-0.09c-0.224-0.051-0.452-0.09-0.683-0.124
 		c-0.102-0.015-0.202-0.035-0.305-0.047C16.677,10.523,16.341,10.5,16,10.5c-4.962,0-9,4.037-9,9c0,0.129,0.007,0.255,0.016,0.381
@@ -43,18 +70,33 @@ const Main = (props) => {
 		c-0.546,0.083-0.921,0.593-0.838,1.139c0.075,0.495,0.501,0.85,0.987,0.85c0.05,0,0.101-0.004,0.152-0.012
 		c2.224-0.336,4.543-0.021,4.684-0.002C54.49,23.372,58,27.661,58,32.472C58,38.001,53.501,42.5,47.972,42.5H44
 		c-0.552,0-1,0.447-1,1s0.448,1,1,1h3.972C54.604,44.5,60,39.104,60,32.472C60,26.983,56.173,22.06,50.975,20.694z"/>
-                                            <path d="M31.708,30.794c-0.092-0.093-0.203-0.166-0.326-0.217c-0.244-0.101-0.52-0.101-0.764,0
+                                                <path d="M31.708,30.794c-0.092-0.093-0.203-0.166-0.326-0.217c-0.244-0.101-0.52-0.101-0.764,0
 		c-0.123,0.051-0.233,0.124-0.326,0.217l-7.999,7.999c-0.391,0.391-0.391,1.023,0,1.414C22.488,40.402,22.744,40.5,23,40.5
 		s0.512-0.098,0.707-0.293L30,33.914V54.5c0,0.553,0.448,1,1,1s1-0.447,1-1V33.914l6.293,6.293C38.488,40.402,38.744,40.5,39,40.5
 		s0.512-0.098,0.707-0.293c0.391-0.391,0.391-1.023,0-1.414L31.708,30.794z"/>
-                                        </g>
+                                            </g>
 
-                                    </svg>
-                                    <span className="block text-grey">Drag and drop your file or click</span>
-                                </>
-                            }
+                                        </svg>
+                                        <span className="block text-grey">Drag and drop your file or click</span>
+                                    </>
 
-                        </div>
+                                }
+
+                            </div> :
+                            <div id="uploading" className={"mb-12"}>
+                                <div className="flex justify-center px-2 mt-12 items-center">
+                                    <Loader
+                                        type="Oval"
+                                        color="#00BFFF"
+                                        height={100}
+                                        width={100}
+                                    />
+                                </div>
+                                <div className="flex justify-center text-base mt-2 mb-2 text-gray-800">
+                                    {uploadPercentages}%
+                                </div>
+                            </div>
+                        }
                         <small>Upload files up to 2GB with one click!</small>
 
                     </div>

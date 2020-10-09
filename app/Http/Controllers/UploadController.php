@@ -6,6 +6,7 @@ use App\Http\Requests\UploadRequest;
 use App\Models\File;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Link;
@@ -26,7 +27,7 @@ class UploadController extends Controller
         $files = $request->file('cloudesk_upload');
 
         // Generate Short url
-        $shortUrl = env("SHORT_URL")."/".Str::random(5);
+        $shortUrl = env("SHORT_URL") . "/" . Str::random(5);
 
         /*
          * Generate a new short link
@@ -35,23 +36,32 @@ class UploadController extends Controller
         $link->url = $shortUrl;
         $link->save();
 
+
+        /*
+         * Data insert
+         */
+        $data = [];
+
         foreach ($files as $file) {
-            $fileModel = new File();
-
-            $fileModel->original_name = $file->getClientOriginalName();
-            $fileModel->unique_name = $file->hashName();
-            $fileModel->last_modified = time();
-            $fileModel->server_path = "/home/$folder/".$file->hashName();
-            $fileModel->size= $file->getSize();
-            $fileModel->extension = $file->getClientOriginalExtension();
-            $fileModel->link_id = $link->id;
-            $fileModel->delete_at = Carbon::now()->addWeek(1);
-            $fileModel->user_id = Auth::user() ? Auth::user()->id : null;
-            $fileModel->save();
-
+            $data[] = [
+                "original_name" => $file->getClientOriginalName(),
+                "unique_name" => $file->hashName(),
+                "last_modified" => time(),
+                "server_path" => "/home/$folder/" . $file->hashName(),
+                "size" => $file->getSize(),
+                "extension" => $file->getClientOriginalExtension(),
+                "link_id" => $link->id,
+                "delete_at" => Carbon::now()->addWeek(1),
+                "user_id" => Auth::user() ? Auth::user()->id : null
+            ];
             Storage::disk('fu_ftp')->put("/home/$folder", $file);
         }
 
-
+        File::insert($data);
+        return response()->json([
+            "success" => "file was uploaded successfully",
+            "file" => $data,
+            "url" => $link->url
+        ], 200);
     }
 }

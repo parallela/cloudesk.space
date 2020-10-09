@@ -17,10 +17,7 @@
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
     <meta property="fb:app_id" content=""/>
-
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png"/>
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
-    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 
     <title>CLOUDESK.SPACE</title>
 
@@ -32,7 +29,7 @@
 <div id="root"></div>
 
 <script>
-    var API_URL = "http://localhost:3000/api/v1/"
+    var API_URL = "{{ env('API_URL') }}";
 </script>
 <script src="{{ asset('js/app.js') }}"></script>
 
