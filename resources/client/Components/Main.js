@@ -1,5 +1,6 @@
 import React, {useCallback, useState} from "react";
 import {useDropzone} from "react-dropzone";
+import axios from "axios";
 import Loader from 'react-loader-spinner'
 
 const Main = (props) => {
@@ -11,24 +12,15 @@ const Main = (props) => {
         setShowUpload(false);
         const uploading = acceptedFiles.map(file => {
             const formData = new FormData();
-            formData.append("cloudesk_upload[]", file);
-            const xhr = new XMLHttpRequest();
-            xhr.upload.onprogress = event => {
-                const percentage = parseInt((event.loaded / event.total) * 100);
-                console.log(event);
-                setUploadPercentages(percentage);
-            };
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState !== 4) return;
-                if (xhr.status !== 200) {
-                    console.log('error'); // Handle error here
-                }
-                console.log('success'); // Handle success here
-            };
-
+            formData.append("cloudesk_upload", file);
             setTimeout(() => {
-                xhr.open('POST', `${window.API_URL}/upload`, true);
-                xhr.send(formData);
+                axios.post(`${window.API_URL}/upload`, formData, {
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "multipart/form-data"
+                    },
+                    onUploadProgress: e => console.log((e.loaded / e.total) * 100)
+                });
             }, 3000)
         });
     }, [])

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b56bfb5d21eaae286e532c3ed2f8941",
+    "content-hash": "3f11412f18406d1d13eb3ca1fdf84819",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4727,6 +4727,50 @@
                 }
             ],
             "time": "2020-07-22T23:32:04+00:00"
+        },
+        {
+            "name": "wester/chunk-upload",
+            "version": "v2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hossein-zare/wester-chunk-upload.git",
+                "reference": "0a326d744e25f4b9028de754d1240d94a18b2ce5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hossein-zare/wester-chunk-upload/zipball/0a326d744e25f4b9028de754d1240d94a18b2ce5",
+                "reference": "0a326d744e25f4b9028de754d1240d94a18b2ce5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wester\\ChunkUpload\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hossein Zare",
+                    "email": "zarehossein.hz1997@gmail.com"
+                }
+            ],
+            "description": "Handle chunked uploads with local and ftp drivers simply in PHP with advanced validation features and localization.",
+            "keywords": [
+                "chunk",
+                "chunked-upload",
+                "php",
+                "resumable",
+                "upload",
+                "validation"
+            ],
+            "time": "2020-09-16T15:59:06+00:00"
         }
     ],
     "packages-dev": [
